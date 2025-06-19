@@ -19,10 +19,14 @@ def analizar():
     resultados = []
     for texto in textos:
         response = requests.post(API_URL, headers=HEADERS, json={"inputs": texto})
-        try:
-            output = response.json()[0]
-        except Exception as e:
-            output = {"error": str(e)}
+       try:
+    result = response.json()
+    if isinstance(result, list):
+        output = result[0]
+    else:
+        output = {"error": result}
+except Exception as e:
+    output = {"error": str(e)}
 
         resultados.append({
             "texto": texto,
