@@ -1,22 +1,32 @@
 from flask import Flask, request, jsonify
-from transformers import pipeline
+import requests
 
 app = Flask(__name__)
 
-# Puedes usar "sentiment-analysis" o probar otro pipeline más personalizado
-modelo = pipeline("sentiment-analysis")
+# URL pública de HuggingFace para análisis de sentimientos
+API_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english"
+
+# Puedes dejar este header vacío si no tienes token
+HEADERS = {
+    "Authorization": ""  # Puedes agregar tu token HuggingFace aquí si lo necesitas
+}
 
 @app.route("/analizar", methods=["POST"])
 def analizar():
     data = request.get_json()
     textos = data.get("entradas", [])
-    
+
     resultados = []
     for texto in textos:
-        analisis = modelo(texto)[0]
+        response = requests.post(API_URL, headers=HEADERS, json={"inputs": texto})
+        try:
+            output = response.json()[0]
+        except Exception as e:
+            output = {"error": str(e)}
+
         resultados.append({
             "texto": texto,
-            "resultado": analisis
+            "resultado": output
         })
 
     return jsonify(resultados)
