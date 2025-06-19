@@ -7,9 +7,8 @@ app = Flask(__name__)
 API_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english"
 
 # Si no tienes una API Key, deja esto vacío. Para uso gratuito no es obligatorio.
-HEADERS = {
-    "Authorization": ""  # Ejemplo: "Bearer hf_xxx..." si usas token (opcional)
-}
+HEADERS = {}
+
 
 @app.route("/analizar", methods=["POST"])
 def analizar():
