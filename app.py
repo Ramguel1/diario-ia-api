@@ -3,12 +3,12 @@ import requests
 
 app = Flask(__name__)
 
-# URL pública de HuggingFace para análisis de sentimientos
+# URL del modelo de análisis de sentimiento en HuggingFace
 API_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english"
 
-# Puedes dejar este header vacío si no tienes token
+# Si no tienes una API Key, deja esto vacío. Para uso gratuito no es obligatorio.
 HEADERS = {
-    "Authorization": ""  # Puedes agregar tu token HuggingFace aquí si lo necesitas
+    "Authorization": ""  # Ejemplo: "Bearer hf_xxx..." si usas token (opcional)
 }
 
 @app.route("/analizar", methods=["POST"])
@@ -19,14 +19,15 @@ def analizar():
     resultados = []
     for texto in textos:
         response = requests.post(API_URL, headers=HEADERS, json={"inputs": texto})
-       try:
-    result = response.json()
-    if isinstance(result, list):
-        output = result[0]
-    else:
-        output = {"error": result}
-except Exception as e:
-    output = {"error": str(e)}
+
+        try:
+            result = response.json()
+            if isinstance(result, list):
+                output = result[0]
+            else:
+                output = {"error": result}
+        except Exception as e:
+            output = {"error": str(e)}
 
         resultados.append({
             "texto": texto,
