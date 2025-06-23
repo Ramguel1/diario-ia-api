@@ -1,9 +1,7 @@
 from flask import Flask, request, jsonify
-import requests
+from textblob import TextBlob
 
 app = Flask(__name__)
-
-API_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english"
 
 @app.route("/analizar", methods=["POST"])
 def analizar():
@@ -12,21 +10,22 @@ def analizar():
 
     resultados = []
     for texto in textos:
-        try:
-            response = requests.post(API_URL, json={"inputs": texto})
-            respuesta_json = response.json()
+        tb = TextBlob(texto)
+        polaridad = tb.sentiment.polarity
 
-            if isinstance(respuesta_json, list):
-                salida = respuesta_json[0]
-            else:
-                salida = {"error": respuesta_json}
-
-        except Exception as e:
-            salida = {"error": str(e)}
+        if polaridad > 0:
+            label = "POSITIVE"
+        elif polaridad < 0:
+            label = "NEGATIVE"
+        else:
+            label = "NEUTRAL"
 
         resultados.append({
             "texto": texto,
-            "resultado": salida
+            "resultado": {
+                "label": label,
+                "score": round(abs(polaridad), 3)
+            }
         })
 
     return jsonify(resultados)
