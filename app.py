@@ -3,6 +3,7 @@ import requests
 
 app = Flask(__name__)
 
+# URL pública del modelo de análisis de sentimiento
 API_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english"
 
 @app.route("/analizar", methods=["POST"])
