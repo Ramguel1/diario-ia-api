@@ -3,12 +3,9 @@ import requests
 
 app = Flask(__name__)
 
-# URL del modelo de análisis de sentimiento en HuggingFace
 API_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english"
 
-# Si no tienes una API Key, deja esto vacío. Para uso gratuito no es obligatorio.
-HEADERS = {}
-
+HEADERS = {} 
 
 @app.route("/analizar", methods=["POST"])
 def analizar():
@@ -35,5 +32,7 @@ def analizar():
 
     return jsonify(resultados)
 
+
 if __name__ == "__main__":
     app.run()
+     
