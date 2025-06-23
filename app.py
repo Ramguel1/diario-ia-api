@@ -3,9 +3,8 @@ import requests
 
 app = Flask(__name__)
 
+# URL pública del modelo de análisis de sentimiento
 API_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english"
-
-HEADERS = {} 
 
 @app.route("/analizar", methods=["POST"])
 def analizar():
@@ -14,25 +13,24 @@ def analizar():
 
     resultados = []
     for texto in textos:
-        response = requests.post(API_URL, headers=HEADERS, json={"inputs": texto})
-
         try:
-            result = response.json()
-            if isinstance(result, list):
-                output = result[0]
+            response = requests.post(API_URL, json={"inputs": texto})
+            respuesta_json = response.json()
+
+            if isinstance(respuesta_json, list):
+                salida = respuesta_json[0]
             else:
-                output = {"error": result}
+                salida = {"error": respuesta_json}
+
         except Exception as e:
-            output = {"error": str(e)}
+            salida = {"error": str(e)}
 
         resultados.append({
             "texto": texto,
-            "resultado": output
+            "resultado": salida
         })
 
     return jsonify(resultados)
 
-
 if __name__ == "__main__":
     app.run()
-     
