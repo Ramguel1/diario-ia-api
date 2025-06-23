@@ -1,7 +1,12 @@
 from flask import Flask, request, jsonify
-from textblob import TextBlob
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import nltk
+
+# Descargar solo la primera vez
+nltk.download('vader_lexicon')
 
 app = Flask(__name__)
+analyzer = SentimentIntensityAnalyzer()
 
 @app.route("/analizar", methods=["POST"])
 def analizar():
@@ -10,37 +15,23 @@ def analizar():
 
     resultados = []
     for texto in textos:
-        try:
-            tb = TextBlob(texto)
+        scores = analyzer.polarity_scores(texto)
+        comp = scores['compound']
 
-            # Traducir a inglés
-            texto_en = tb.translate(to="en")
-            tb_en = TextBlob(str(texto_en))
+        if comp >= 0.1:
+            label = "POSITIVE"
+        elif comp <= -0.1:
+            label = "NEGATIVE"
+        else:
+            label = "NEUTRAL"
 
-            polaridad = tb_en.sentiment.polarity
-
-            if polaridad >= 0.1:
-                label = "POSITIVE"
-            elif polaridad <= -0.1:
-                label = "NEGATIVE"
-            else:
-                label = "NEUTRAL"
-
-            resultados.append({
-                "texto": texto,
-                "resultado": {
-                    "label": label,
-                    "score": round(abs(polaridad), 3)
-                }
-            })
-
-        except Exception as e:
-            resultados.append({
-                "texto": texto,
-                "resultado": {
-                    "error": str(e)
-                }
-            })
+        resultados.append({
+            "texto": texto,
+            "resultado": {
+                "label": label,
+                "score": round(comp, 3)
+            }
+        })
 
     return jsonify(resultados)
 
