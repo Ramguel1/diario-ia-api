@@ -13,9 +13,10 @@ def analizar():
         tb = TextBlob(texto)
         polaridad = tb.sentiment.polarity
 
-        if polaridad > 0:
+        # Ajustamos el umbral para que sea menos estricto
+        if polaridad >= 0.1:
             label = "POSITIVE"
-        elif polaridad < 0:
+        elif polaridad <= -0.1:
             label = "NEGATIVE"
         else:
             label = "NEUTRAL"
